@@ -1,7 +1,11 @@
+const path = require("path");
+  
 module.exports = {
   packagerConfig: {
     asar: false,
-    icon: "src/public/images/icon"
+    icon: process.platform === "win32"
+      ? path.resolve(__dirname, "src/public/images/icon.ico")
+      : path.resolve(__dirname, "src/public/images/icon.png")
   },
   makers: [
     {
