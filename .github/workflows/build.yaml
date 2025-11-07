@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -29,13 +29,15 @@ jobs:
       - name: Build project
         run: |
           npm run make
-          ls out/make
+          ls out/make/zip/linux/
 
       - name: Upload build output
         uses: actions/upload-pages-artifact@v3
         with:
           name: Linux Executable
-          path: ./out/make/
+          path: |
+            ./out/make/zip/linux/arm64/*.zip
+            ./out/make/zip/linux/x64/*.zip
 
   release:
     needs: [linux-build]
