@@ -37,7 +37,6 @@ jobs:
           name: Linux Executable
           path: |
             ./out/make/zip/linux
-
   release:
     needs: [linux-build]
     if: always()  
