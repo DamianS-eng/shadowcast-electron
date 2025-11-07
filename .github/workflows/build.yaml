@@ -29,13 +29,13 @@ jobs:
       - name: Build project
         run: |
           npm run make
-          ls
+          ls out/make
 
       - name: Upload build output
         uses: actions/upload-pages-artifact@v3
         with:
           name: Linux Executable
-          path: ./dist
+          path: ./out/make/
 
   release:
     needs: [linux-build]
