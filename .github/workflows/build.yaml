@@ -1,0 +1,78 @@
+name: Auto Build
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  linux-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          #cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run make
+
+      - name: Upload build output
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: Linux Executable
+          path: ./dist
+
+  release:
+    needs: [linux-build]
+    if: always()  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Download Linux built
+        id: linux_built
+        uses: actions/download-artifact@v4
+        with:
+          name: Linux Executable
+          path: .dist/
+        continue-on-error: true
+      - name: Generate tag
+        run: |
+          VERSION="v$(date +'%Y.%m.%d.%H%M')"   # e.g. v2025.11.06.2019
+          echo "TAG=$VERSION" >> $GITHUB_ENV
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag $VERSION
+          git push origin $VERSION
+          if [ -d "dist/" ] && [ "$(ls -A dist/)" ]; then
+            tar -czf linux.tar.gz dist/ || true
+          else
+            echo "No Linux binary found."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Github Release
+        if: |
+          (steps.linux_built.outcome == 'success')
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            linux.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
