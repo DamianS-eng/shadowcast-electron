@@ -29,14 +29,13 @@ jobs:
       - name: Build project
         run: |
           npm run make
-          ls out/make/zip/linux/
-
+          ls out/make/zip/linux/arm64
+          ls out/make/zip/linux/x64
       - name: Upload build output
         uses: actions/upload-pages-artifact@v3
         with:
           name: Linux Executable
-          path: |
-            ./out/make/zip/linux
+          path: out/make/zip/linux
   release:
     needs: [linux-build]
     if: always()  
@@ -69,12 +68,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Github Release
-        if: |
-          (steps.linux_built.outcome == 'success')
+        if: (steps.linux_built.outcome == 'success')
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ env.TAG }}
-          files: |
-            linux.tar.gz
+          files: linux.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
