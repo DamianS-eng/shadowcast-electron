@@ -27,7 +27,9 @@ jobs:
         run: npm install
 
       - name: Build project
-        run: npm run make
+        run: |
+          npm run make
+          ls
 
       - name: Upload build output
         uses: actions/upload-pages-artifact@v3
