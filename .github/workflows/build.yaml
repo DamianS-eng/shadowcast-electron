@@ -36,8 +36,7 @@ jobs:
         with:
           name: Linux Executable
           path: |
-            out/make/zip/linux/arm64/*.zip
-            out/make/zip/linux/x64/*.zip
+            ./out/make/zip/linux
 
   release:
     needs: [linux-build]
